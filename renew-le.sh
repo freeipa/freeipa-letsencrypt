@@ -1,6 +1,10 @@
 #!/usr/bin/bash
 set -o nounset -o errexit
 
+WORKDIR="/root/ipa-le"
+EMAIL="your-email@example.com"
+#cd "$WORKDIR"
+
 ### cron
 # check that the cert will last at least 2 days from now to prevent too frequent renewal
 # comment out this line for the first run
@@ -12,8 +16,8 @@ fi
 # cert renewal is needed if we reached this line
 
 # cleanup
-rm -f /root/*.pem
-rm -f /root/httpd-csr.*
+rm -f "$WORKDIR"/*.pem
+rm -f "$WORKDIR"/httpd-csr.*
 
 # generate CSR
 certutil -R -d /etc/httpd/alias/ -k Server-Cert -f /etc/httpd/alias/pwdfile.txt -s "CN=$(hostname)" --extSAN "dns:$(hostname)" -a -o /root/httpd-csr.pem
@@ -23,7 +27,7 @@ openssl req -in /root/httpd-csr.pem -outform der -out /root/httpd-csr.der
 service httpd stop
 
 # get a new cert
-letsencrypt certonly --standalone --csr /root/httpd-csr.der --email letsencrypt@example.com --agree-tos
+letsencrypt certonly --standalone --csr "$WORKDIR/httpd-csr.der" --email "$EMAIL" --agree-tos
 
 # remove old cert
 certutil -D -d /etc/httpd/alias/ -n Server-Cert
