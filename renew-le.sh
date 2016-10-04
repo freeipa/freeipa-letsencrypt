@@ -28,7 +28,7 @@ letsencrypt certonly --standalone --csr /root/httpd-csr.der --email letsencrypt@
 # remove old cert
 certutil -D -d /etc/httpd/alias/ -n Server-Cert
 # add the new cert
-certutil -A -d /etc/httpd/alias/ -n Server-Cert -t ,, -a -i /root/0000_cert.pem
+certutil -A -d /etc/httpd/alias/ -n Server-Cert -t u,u,u -a -i "$WORKDIR/0000_cert.pem"
 
 # start httpd with the new cert
 service httpd start
