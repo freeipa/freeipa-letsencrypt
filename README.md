@@ -10,3 +10,7 @@ To use it, do this:
   * install Let's Encrypt CA certificates into FreeIPA certificate store
   * requests new certificate for FreeIPA web interface
 * run renew-le.sh script once a day: it will renew the cert as necessary
+
+
+If you have any problem, feel free to contact FreeIPA team:
+http://www.freeipa.org/page/Contribute#Communication
