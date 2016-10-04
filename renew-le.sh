@@ -2,9 +2,12 @@
 set -o nounset -o errexit
 
 ### cron
-# check that the cert will last at least 2 days from now
-# TODO: uncomment after the first run
-#certutil -d /etc/httpd/alias/ -V -u V -n Server-Cert -b "$(date '+%y%m%d%H%M%S%z' --date='2 days')" && exit 0
+# check that the cert will last at least 2 days from now to prevent too frequent renewal
+# comment out this line for the first run
+if [ "${1:-renew}" != "--first-time" ]
+then
+	certutil -d /etc/httpd/alias/ -V -u V -n Server-Cert -b "$(date '+%y%m%d%H%M%S%z' --date='2 days')" && exit 0
+fi
 
 # cert renewal is needed if we reached this line
 

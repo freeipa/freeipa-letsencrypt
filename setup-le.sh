@@ -11,3 +11,4 @@ ipa-certupdate -v
 ipa-cacert-manage install /root/ca/LetsEncryptAuthorityX1.pem -n letsencrypt -t C,,
 ipa-certupdate -v
 
+"$(dirname "$0")/renew-le.sh" "--first-time"
