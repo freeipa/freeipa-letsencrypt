@@ -2,7 +2,7 @@
 set -o nounset -o errexit
 
 WORKDIR="/root/ipa-le"
-EMAIL="your-email@example.com"
+EMAIL=""
 #cd "$WORKDIR"
 
 ### cron
