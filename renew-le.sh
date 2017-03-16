@@ -20,7 +20,7 @@ rm -f "$WORKDIR"/*.pem
 rm -f "$WORKDIR"/httpd-csr.*
 
 # generate CSR
-certutil -R -d /etc/httpd/alias/ -k Server-Cert -f /etc/httpd/alias/pwdfile.txt -s "CN=$(hostname)" --extSAN "dns:$(hostname)" -o "$WORKDIR/httpd-csr.der"
+certutil -R -d /etc/httpd/alias/ -k Server-Cert -f /etc/httpd/alias/pwdfile.txt -s "CN=$(hostname -f)" --extSAN "dns:$(hostname -f)" -o "$WORKDIR/httpd-csr.der"
 
 # httpd process prevents letsencrypt from working, stop it
 service httpd stop
