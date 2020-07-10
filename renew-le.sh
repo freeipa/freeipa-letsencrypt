@@ -30,7 +30,7 @@ openssl req -new -sha256 -config "$WORKDIR/ipa-httpd.cnf"  -key /var/lib/ipa/pri
 service httpd stop
 
 # get a new cert
-letsencrypt certonly --standalone --csr "$WORKDIR/httpd-csr.der" --email "$EMAIL" --agree-tos
+letsencrypt certonly --standalone --csr "$WORKDIR/httpd-csr.der" --email "$EMAIL" --agree-tos --no-eff-email
 
 # replace the cert
 cp /var/lib/ipa/certs/httpd.crt /var/lib/ipa/certs/httpd.crt.bkp
