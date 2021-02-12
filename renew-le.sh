@@ -1,8 +1,13 @@
 #!/usr/bin/bash
 set -o nounset -o errexit
 
+
 WORKDIR=$(dirname "$(realpath $0)")
 EMAIL=""
+
+# This is needed for enabling the certificates
+# TODO : Store safely
+DIRPASSWD=""
 
 ### cron
 # check that the cert will last at least 2 days from now to prevent too frequent renewal
@@ -16,28 +21,48 @@ then
 		exit 0
 	fi
 fi
+
 cd "$WORKDIR"
 # cert renewal is needed if we reached this line
 
 # cleanup
-rm -f "$WORKDIR"/*.pem
-rm -f "$WORKDIR"/httpd-csr.*
+needs_cleanup=false
+for f in "$WORKDIR/*.key"; do
+	echo $f
+    ## Check if the glob gets expanded to existing files.
+    ## If not, f here will be exactly the pattern above
+    ## and the exists test will evaluate to false.
+	if [ -e $f ]; then
+		needs_cleanup=true
+	fi
+
+    ## This is all we needed to know, so we can break after the first iteration
+    break
+done
+
+if [ "$needs_cleanup" = true ]; then
+	#backup
+	echo "BACKUP"
+	mkdir -p "$WORKDIR"/backup
+	rm -f "$WORKDIR"/backup/*
+	mv "$WORKDIR"/*.key "$WORKDIR"/backup/
+	mv "$WORKDIR"/*.pem "$WORKDIR"/backup/
+
+	#cleanup
+	rm -f "$WORKDIR"/*.csr
+	rm -f "$WORKDIR"/*.key
+	rm -f "$WORKDIR"/*.pem
+fi
 
 # generate CSR
-OPENSSL_PASSWD_FILE="/var/lib/ipa/passwds/$HOSTNAME-443-RSA"
-[ -f "$OPENSSL_PASSWD_FILE" ] && OPENSSL_EXTRA_ARGS="-passout file:$OPENSSL_PASSWD_FILE" || OPENSSL_EXTRA_ARGS=""
-openssl req -new -sha256 -config "$WORKDIR/ipa-httpd.cnf"  -key /var/lib/ipa/private/httpd.key -out "$WORKDIR/httpd-csr.der" $OPENSSL_EXTRA_ARGS
+openssl req -new -config "$WORKDIR/ipa-httpd.cnf" -keyout "$WORKDIR/req.key" -out "$WORKDIR/req.csr"
 
 # httpd process prevents letsencrypt from working, stop it
 service httpd stop
 
 # get a new cert
-letsencrypt certonly --standalone --csr "$WORKDIR/httpd-csr.der" --email "$EMAIL" --agree-tos
+letsencrypt certonly --standalone --csr "$WORKDIR/req.csr" --email "$EMAIL" --agree-tos --cert-path "$WORKDIR/cert.pem" --chain-path "$WORKDIR/chain.pem" --fullchain-path "$WORKDIR/fullchain.pem"
 
 # replace the cert
-cp /var/lib/ipa/certs/httpd.crt /var/lib/ipa/certs/httpd.crt.bkp
-mv -f "$WORKDIR/0000_cert.pem" /var/lib/ipa/certs/httpd.crt
-restorecon -v /var/lib/ipa/certs/httpd.crt
-
-# start httpd with the new cert
-service httpd start
+yes $DIRPASSWD "" | ipa-server-certinstall -w -d "$WORKDIR/req.key" "$WORKDIR/cert.pem"
+ipactl restart
