@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 set -o nounset -o errexit
 
-
 WORKDIR=$(dirname "$(realpath $0)")
 EMAIL=""
 
@@ -14,16 +13,19 @@ DIRPASSWD=""
 # comment out this line for the first run
 if [ "${1:-renew}" != "--first-time" ]
 then
-	start_timestamp=`date +%s --date="$(openssl x509 -startdate -noout -in /var/lib/ipa/certs/httpd.crt | cut -d= -f2)"`
-	now_timestamp=`date +%s`
-	let diff=($now_timestamp-$start_timestamp)/86400
-	if [ "$diff" -lt "2" ]; then
-		exit 0
-	fi
+        echo "Checking when certificate was renewed"
+        start_timestamp=`date +%s --date="$(openssl x509 -startdate -noout -in /var/lib/ipa/certs/httpd.crt | cut -d= -f2)"`
+        now_timestamp=`date +%s`
+        diff=$(((now_timestamp-start_timestamp) / 86400))
+        if [ "$diff" -lt "2" ]; then
+                echo "No renewal needed"
+                exit 0
+        fi
 fi
 
 cd "$WORKDIR"
 # cert renewal is needed if we reached this line
+echo "Renewal needed"
 
 # cleanup
 needs_cleanup=false
