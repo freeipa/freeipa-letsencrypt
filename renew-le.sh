@@ -26,6 +26,8 @@ rm -f "$WORKDIR"/httpd-csr.*
 # generate CSR
 OPENSSL_PASSWD_FILE="/var/lib/ipa/passwds/$HOSTNAME-443-RSA"
 [ -f "$OPENSSL_PASSWD_FILE" ] && OPENSSL_EXTRA_ARGS="-passout file:$OPENSSL_PASSWD_FILE" || OPENSSL_EXTRA_ARGS=""
+OPENSSL_PASSPHRASE=$( /usr/libexec/ipa/ipa-httpd-pwdreader $HOSTNAME:443 RSA)
+[[ -n "$OPENSSL_PASSPHRASE" ]] && OPENSSL_EXTRA_ARGS="$OPENSSL_EXTRA_ARGS -passin pass:$OPENSSL_PASSPHRASE"
 openssl req -new -sha256 -config "$WORKDIR/ipa-httpd.cnf"  -key /var/lib/ipa/private/httpd.key -out "$WORKDIR/httpd-csr.der" $OPENSSL_EXTRA_ARGS
 
 # httpd process prevents letsencrypt from working, stop it
