@@ -3,9 +3,8 @@ to FreeIPA web interface.
 
 To use it, do this:
 * BACKUP /var/lib/ipa/certs/ and /var/lib/ipa/private/ to some safe place (it contains private keys!)
-* clone/unpack all scripts including "ca" subdirectory somewhere
+* clone/unpack all scripts somewhere
 * set EMAIL variable in renew-le.sh
-* set FQDN in ipa-httpd.cnf
 * run setup-le.sh script once to prepare the machine. The script will:
   * install Let's Encrypt client package
   * install Let's Encrypt CA certificates into FreeIPA certificate store
