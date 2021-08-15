@@ -11,6 +11,11 @@ To use it, do this:
   * requests new certificate for FreeIPA web interface
 * run renew-le.sh script once a day: it will renew the cert as necessary
 
+## Service files
+* instead of anywhere, clone/unpack all the scripts into `/usr/local/sbin/ipa-certbot/` instead.
+* copy `freeipa-certbot.service` and `freeipa-certbot.timer` into `/etc/systemd/system/`
+* run `systemctl daemon-reload; systemctl enable freeipa-certbot.service; systemctl enable freeipa-certbot.timer --now`
+
 
 If you have any problem, feel free to contact FreeIPA team:
 http://www.freeipa.org/page/Contribute#Communication
