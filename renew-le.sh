@@ -25,11 +25,15 @@ rm -f "$WORKDIR"/httpd-csr.*
 
 # generate CSR
 OPENSSL_PASSWD_FILE="/var/lib/ipa/passwds/$HOSTNAME-443-RSA"
-[ -f "$OPENSSL_PASSWD_FILE" ] && OPENSSL_EXTRA_ARGS="-passout file:$OPENSSL_PASSWD_FILE" || OPENSSL_EXTRA_ARGS=""
+[ -f "$OPENSSL_PASSWD_FILE" ] && OPENSSL_EXTRA_ARGS="-passin file:$OPENSSL_PASSWD_FILE" || OPENSSL_EXTRA_ARGS=""
 openssl req -new -sha256 -config "$WORKDIR/ipa-httpd.cnf"  -key /var/lib/ipa/private/httpd.key -out "$WORKDIR/httpd-csr.der" $OPENSSL_EXTRA_ARGS
 
 # httpd process prevents letsencrypt from working, stop it
-service httpd stop
+if ! command -v service >/dev/null 2>&1; then
+	systemctl stop httpd
+else
+	service httpd stop
+fi
 
 # get a new cert
 letsencrypt certonly --standalone --csr "$WORKDIR/httpd-csr.der" --email "$EMAIL" --agree-tos
@@ -40,4 +44,8 @@ mv -f "$WORKDIR/0000_cert.pem" /var/lib/ipa/certs/httpd.crt
 restorecon -v /var/lib/ipa/certs/httpd.crt
 
 # start httpd with the new cert
-service httpd start
+if ! command -v service >/dev/null 2>&1; then
+	systemctl start httpd
+else
+	service httpd start
+fi
