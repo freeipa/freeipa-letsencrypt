@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -o nounset -o errexit
 
 FQDN=$(hostname -f)
