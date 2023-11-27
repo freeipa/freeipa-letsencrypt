@@ -5,14 +5,14 @@ WORKDIR=$(dirname "$(realpath $0)")
 EMAIL=""
 
 ### cron
-# check that the cert will last at least 2 days from now to prevent too frequent renewal
+# skip renewal if the cert is still valid for more than 30 days
 # comment out this line for the first run
 if [ "${1:-renew}" != "--first-time" ]
 then
-	start_timestamp=`date +%s --date="$(openssl x509 -startdate -noout -in /var/lib/ipa/certs/httpd.crt | cut -d= -f2)"`
+	end_timestamp=`date +%s --date="$(openssl x509 -enddate -noout -in /var/lib/ipa/certs/httpd.crt | cut -d= -f2)"`
 	now_timestamp=`date +%s`
-	let diff=($now_timestamp-$start_timestamp)/86400
-	if [ "$diff" -lt "2" ]; then
+	let diff=($end_timestamp-$now_timestamp)/86400
+	if [ "$diff" -gt "30" ]; then
 		exit 0
 	fi
 fi
