@@ -1,0 +1,13 @@
+[Unit]
+Description=Renew certbot IPA certificate
+Wants=freeipa-certbot.timer
+
+[Service]
+User=root
+Type=oneshot
+ExecStart=/usr/local/sbin/ipa-certbot/renew-le.sh
+SuccessExitStatus=0, 1
+
+
+[Install]
+WantedBy=multi-user.target
