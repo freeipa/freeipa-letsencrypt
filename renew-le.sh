@@ -40,7 +40,7 @@ letsencrypt certonly --standalone --csr "$WORKDIR/httpd-csr.der" --email "$EMAIL
 
 # replace the cert
 cp /var/lib/ipa/certs/httpd.crt /var/lib/ipa/certs/httpd.crt.bkp
-cat "$WORKDIR/0000_cert.pem" "$WORKDIR/0001_chain.pem" > "$WORKDIR/full_chain.pem"
+cat "$WORKDIR/0000_cert.pem" "$WORKDIR/0000_chain.pem" > "$WORKDIR/full_chain.pem"
 mv -f "$WORKDIR/full_chain.pem" /var/lib/ipa/certs/httpd.crt
 restorecon -v /var/lib/ipa/certs/httpd.crt
 
