@@ -1,9 +1,9 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -o nounset -o errexit
 
 FQDN=$(hostname -f)
 WORKDIR=$(dirname "$(realpath $0)")
-CERTS=("isrgrootx1.pem" "isrg-root-x2.pem" "lets-encrypt-r3.pem" "lets-encrypt-e1.pem" "lets-encrypt-r4.pem" "lets-encrypt-e2.pem")
+CERTS=("isrgrootx1.pem" "isrg-root-x2.pem" "lets-encrypt-r3.pem" "lets-encrypt-e1.pem" "lets-encrypt-r4.pem" "lets-encrypt-e2.pem" "2024/e5.pem" "2024/e5-cross.pem" "2024/e6.pem" "2024/e6-cross.pem" "2024/r10.pem" "2024/r11.pem")
 
 sed -i "s/server.example.test/$FQDN/g" $WORKDIR/ipa-httpd.cnf
 
@@ -18,12 +18,12 @@ for CERT in "${CERTS[@]}"
 do
   if command -v wget &> /dev/null
   then
-    wget -O "/etc/ssl/$FQDN/$CERT" "https://letsencrypt.org/certs/$CERT"
+    wget -O "/etc/ssl/$FQDN/${CERT##*/}" "https://letsencrypt.org/certs/$CERT"
   elif command -v curl &> /dev/null
   then
-    curl -o "/etc/ssl/$FQDN/$CERT" "https://letsencrypt.org/certs/$CERT"
+    curl -o "/etc/ssl/$FQDN/${CERT##*/}" "https://letsencrypt.org/certs/$CERT"
   fi
-  ipa-cacert-manage install "/etc/ssl/$FQDN/$CERT"
+  ipa-cacert-manage install "/etc/ssl/$FQDN/${CERT##*/}"
 done
 
 ipa-certupdate
