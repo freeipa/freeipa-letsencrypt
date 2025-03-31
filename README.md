@@ -1,3 +1,5 @@
+WARNING: these scripts were created for use by the freeIPA demo server. They no longer work. Continued use is not recommended.
+
 These two scripts try to automatically obtain and install Let's Encrypt certs
 to FreeIPA web interface.
 
