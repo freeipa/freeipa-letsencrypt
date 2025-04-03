@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for certbot IPA certificate renewal
+Requires=freeipa-certbot.service
+
+[Timer]
+Unit=freeipa-certbot.service
+OnCalendar=*-*-* 08:34
+
+[Install]
+WantedBy=timers.target
